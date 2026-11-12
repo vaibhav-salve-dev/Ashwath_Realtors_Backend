@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1 id="txt">hello world</h1>
+    <button onClick="getData()">Get data</button>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" id="fileInput" name="image"/>
+        <input type="text" id="txt">
+        <button type="button" onclick="uploadFile()">Upload</button>
+    </form>
+
+    <button onClick="getDat()">Click me</button>
+
+    <table border="2">
+        <thead id="hed">
+
+        </thead>
+        <tbody id="bdy">
+        </tbody>
+    </table>
+
+   <button onClick="sendMail()">Mail</button>
+
+    
+
+
+    <script>
+
+        function sendMail()
+        {
+            fetch("http://localhost:5100/api/sendEmailLink")
+                .then(res => {
+                    return res.json();
+                })
+                .then(data => {
+                    window.location.href = data.link;
+                })
+                .catch(err => {
+                    console.log("err :", err);
+                })
+        }
+        function getData() {
+            let op = document.getElementById("txt");
+            // op.innerText="op bhai !";
+            fetch("http://localhost:5100/api")
+                .then(res => {
+                    return res.text();
+                })
+                .then(data => {
+                    console.log("data: ", data);
+                    op.innerText = data;
+                })
+                .catch(err => {
+                    console.log("err :", err);
+                })
+        }
+
+        function uploadFile() {
+            const fileInput = document.getElementById("fileInput");
+            let ss=document.getElementById("txt").value;
+            const formData = new FormData();
+            formData.append("Title", "build");
+            formData.append("name",ss);
+            formData.append("Category","residential");
+            formData.append("Status","completed");
+            formData.append("Year",2023);
+            formData.append("Duration","12 month");
+            formData.append("Image", fileInput.files[0]);
+            formData.append("Description","choti building");
+
+            fetch("http://localhost:5100/api/project/getData", {
+                method: "POST",
+                body: formData
+            })
+                .then(res => res.text())
+                .then(data => {
+                    console.log("Response:", data);
+                    
+                })
+                .catch(err => console.error("Error:", err));
+        }
+
+        function getDat()
+        {
+            fetch("http://localhost:5100/api/project/sendData")
+            .then(res=>{
+                return res.json();
+            })
+            .then(data=>{
+                console.log("data : ",data);
+                let hed=document.getElementById("hed");
+                let body=document.getElementById("bdy");
+                let tr,td,th;
+                let obj1=data[1];
+                console.log("obj1 : ",obj1);
+                for(k in obj1)
+            {
+                console.log("k : ",obj1[k]);
+                th=document.createElement("th");
+                th.textContent=k;
+                hed.append(th);
+            }
+
+            data.forEach(obj => {
+                tr=document.createElement("tr");
+                for(k in obj)
+            {
+                td=document.createElement("td");
+                if(k!="Image")
+            {  
+                td.textContent=obj[k];
+                tr.append(td);
+            }else{
+                let img=document.createElement("img");
+                img.style.height="70px";
+                img.style.width="100px";
+                img.src=obj[k];
+                td.append(img);
+                tr.append(td);
+            }
+               
+            }
+            body.append(tr)
+                
+            });
+            
+
+            })
+            .catch(err=>{
+                console.log("send err : ",err);
+            })
+        }
+    </script>
+</body>
+
+</html>
